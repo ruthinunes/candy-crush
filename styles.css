@@ -1,0 +1,138 @@
+@import url("https://fonts.googleapis.com/css2?family=Emilys+Candy&display=swap");
+
+* {
+  border: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  list-style: none;
+}
+
+:root {
+  --purple-color: #924ba880;
+  --white-color: #fff;
+  --blue-dark-color: #1a237e;
+  --blue-light-color: #add8e6;
+  --gray-color: #708090;
+  --body-font: "Emilys Candy", serif;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: url("./images/background.jpg") no-repeat center fixed;
+  background-size: cover;
+  text-align: center;
+  font-family: var(--body-font);
+}
+
+.game__score {
+  margin-bottom: 1rem;
+  color: var(--blue-dark-color);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.game__button {
+  font-family: var(--body-font);
+  margin-bottom: 2rem;
+  padding: 10px 20px;
+  font-size: 16px;
+  letter-spacing: 6px;
+  cursor: pointer;
+  background-color: var(--purple-color);
+  color: var(--white-color);
+  border-radius: 5px;
+  font-weight: bold;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.game__button:hover {
+  color: var(--blue-dark-color);
+  background-color: var(--white-color);
+}
+
+.game__board {
+  margin: auto;
+  background-color: var(--blue-light-color);
+  border: 2px solid var(--gray-color);
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  width: 305px;
+  height: 305px;
+}
+
+.game__card {
+  width: 34px;
+  height: 34px;
+}
+
+@media screen and (min-width: 381px) {
+  .game__board {
+    width: 350px;
+    height: 350px;
+  }
+
+  .game__card {
+    width: 39px;
+    height: 39px;
+  }
+}
+
+@media screen and (min-width: 470px) {
+  .game__button {
+    font-size: 20px;
+  }
+
+  .game__board {
+    width: 400px;
+    height: 400px;
+  }
+
+  .game__card {
+    width: 45px;
+    height: 45px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .game__board {
+    width: 450px;
+    height: 450px;
+  }
+
+  .game__card {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media screen and (min-width: 825px) {
+  .game__board {
+    width: 500px;
+    height: 500px;
+  }
+
+  .game__card {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+@media screen and (min-width: 1440px) {
+  .game__board {
+    width: 600px;
+    height: 600px;
+  }
+
+  .game__card {
+    width: 67px;
+    height: 67px;
+  }
+}
