@@ -10,6 +10,94 @@ const game = {
   gameStarted: false,
   score: 0,
 
+  isMobileDevice: () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+  },
+
+  addMovesEvent: (card, candy, index) => {
+    if (game.isMobileDevice()) {
+      game.setCardMoves(card, candy, index);
+    } else {
+      game.setCardsClick(card, candy, index);
+    }
+  },
+
+  setCardMoves: (card, candy, index) => {
+    card.addEventListener("touchstart", (e) => game.dragStart(candy, index));
+    card.addEventListener("touchend", (e) => game.touchEnd(e));
+  },
+
+  touchMove: (e) => {
+    // Obtém a posição do toque relativa ao elemento do jogo
+    const touchX = e.touches[0].clientX;
+    const touchY = e.touches[0].clientY;
+
+    // Calcula a posição do toque em relação ao elemento do jogo
+    const rect = game.board.getBoundingClientRect();
+    const offsetX = touchX - rect.left;
+    const offsetY = touchY - rect.top;
+
+    console.log(offsetX);
+    console.log(offsetY);
+
+    // Faça o que for necessário com as coordenadas do toque (por exemplo, atualizar a posição do elemento do jogo)
+    // Por exemplo:
+    // game.moveElement(offsetX, offsetY);
+  },
+
+  touchEnd: (e) => {
+    // Obtém a posição final do toque
+    const touchX = e.changedTouches[0].clientX;
+    const touchY = e.changedTouches[0].clientY;
+
+    // Calcula a posição do toque em relação ao elemento do jogo
+    const rect = game.board.getBoundingClientRect();
+    const offsetX = touchX - rect.left;
+    const offsetY = touchY - rect.top;
+
+    // Encontra o índice da peça do jogo com base na posição do toque
+    const index = game.findIndexByCoordinates(offsetX, offsetY);
+
+    // Verifica se o toque é válido e executa a lógica correspondente
+    if (index !== -1 && game.randomCandies[index] !== "") {
+      // console.log("VALID MOVE");
+      // Temporariamente troca os doces
+      const tempIndex = game.randomCandies[game.selectedcandyIndex];
+      game.randomCandies[game.selectedcandyIndex] = game.randomCandies[index];
+      game.randomCandies[index] = tempIndex;
+
+      // Verifica se a troca resulta em um movimento válido
+      if (game.checkValidSlide()) {
+        game.crushCandies();
+        game.updateBoard();
+        return;
+      } else {
+        // console.log("INVALID MOVE");
+        // Reverte a troca se não for um movimento válido
+        game.randomCandies[index] = game.randomCandies[game.selectedcandyIndex];
+        game.randomCandies[game.selectedcandyIndex] = tempIndex;
+      }
+    }
+
+    // Limpa as variáveis
+    game.selectedcandy = null;
+    game.selectedcandyIndex = null;
+  },
+
+  findIndexByCoordinates: (offsetX, offsetY) => {
+    // Calcula a posição da peça do jogo com base nas coordenadas do toque
+    const column = Math.floor(offsetX / (game.board.offsetWidth / game.width));
+    const row = Math.floor(offsetY / (game.board.offsetHeight / game.width));
+
+    // Calcula o índice da peça do jogo com base na linha e coluna
+    const index = row * game.width + column;
+
+    // Retorna o índice da peça do jogo
+    return index;
+  },
+
   getrandomCandies: () => {
     for (let i = 0; i < game.width * game.width; i++) {
       const randomCandy =
@@ -31,7 +119,7 @@ const game = {
       game.board.append(card);
 
       // Event listeners for cards
-      game.setCardsClick(card, candy, index);
+      game.addMovesEvent(card, candy, index);
     });
 
     // Event listener for start button
@@ -51,7 +139,7 @@ const game = {
     window.setInterval(() => {
       game.crushCandies();
       game.slideDown();
-      game.generateNewCandies();
+      game.getNewCandies();
     }, 300);
   },
 
@@ -105,7 +193,7 @@ const game = {
     return false;
   },
 
-  checkCombinationGeneric: (matrix) => {
+  checkCombination: (matrix) => {
     let combinationLength = matrix.length;
     let candiesToCheck = [];
 
@@ -138,13 +226,19 @@ const game = {
     return isValid;
   },
 
+  crushCandies: () => {
+    game.crushFive();
+    game.crushFour();
+    game.crushThree();
+  },
+
   crushThree: () => {
     for (i = 0; i <= 61; i++) {
       let row = [i, i + 1, i + 2];
       let col = [i, i + game.width, i + game.width * 2];
 
-      game.checkCombinationGeneric(row);
-      game.checkCombinationGeneric(col);
+      game.checkCombination(row);
+      game.checkCombination(col);
     }
     game.updateBoard();
   },
@@ -154,8 +248,8 @@ const game = {
       let row = [i, i + 1, i + 2, i + 3];
       let col = [i, i + game.width, i + game.width * 2, i + game.width * 3];
 
-      game.checkCombinationGeneric(row);
-      game.checkCombinationGeneric(col);
+      game.checkCombination(row);
+      game.checkCombination(col);
     }
     game.updateBoard();
   },
@@ -171,19 +265,13 @@ const game = {
         i + game.width * 4,
       ];
 
-      game.checkCombinationGeneric(row);
-      game.checkCombinationGeneric(col);
+      game.checkCombination(row);
+      game.checkCombination(col);
     }
     game.updateBoard();
   },
 
-  crushCandies: () => {
-    game.crushFive();
-    game.crushFour();
-    game.crushThree();
-  },
-
-  generateNewCandies: () => {
+  getNewCandies: () => {
     for (let i = 0; i < game.width; i++) {
       if (game.randomCandies[i] === "") {
         const randomcandy =
@@ -235,7 +323,8 @@ const game = {
 
   dragLeave: () => {},
 
-  dragEnd: () => {
+  dragEnd: (candy, index) => {
+    console.log(candy, index);
     game.updateBoard();
     // cleaning variables
     game.selectedcandy = null;
@@ -250,7 +339,7 @@ const game = {
         index + 1,
         index + game.width,
       ];
-
+      console.log(validMoves.includes(game.selectedcandyIndex));
       if (
         validMoves.includes(game.selectedcandyIndex) &&
         game.randomCandies[index] !== ""
