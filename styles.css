@@ -66,6 +66,7 @@ body {
   flex-wrap: wrap;
   width: 305px;
   height: 305px;
+  touch-action: manipulation;
 }
 
 .game__card {
