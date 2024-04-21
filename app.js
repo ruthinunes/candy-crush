@@ -25,7 +25,10 @@ const game = {
   },
 
   setCardMoves: (card, candy, index) => {
-    card.addEventListener("touchstart", (e) => game.dragStart(candy, index));
+    card.addEventListener("touchstart", (e) => {
+      e.preventDefault()
+      game.dragStart(candy, index);
+    });
     card.addEventListener("touchend", (e) => game.touchEnd(e));
   },
 
@@ -324,7 +327,6 @@ const game = {
   dragLeave: () => {},
 
   dragEnd: (candy, index) => {
-    console.log(candy, index);
     game.updateBoard();
     // cleaning variables
     game.selectedcandy = null;
@@ -339,7 +341,6 @@ const game = {
         index + 1,
         index + game.width,
       ];
-      console.log(validMoves.includes(game.selectedcandyIndex));
       if (
         validMoves.includes(game.selectedcandyIndex) &&
         game.randomCandies[index] !== ""
