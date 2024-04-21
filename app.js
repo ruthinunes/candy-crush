@@ -4,6 +4,7 @@ const game = {
   board: document.querySelector(".game__board"),
   candies: ["Blue", "Green", "Orange", "Purple", "Red", "Yellow"],
   width: 8,
+  scrolling: true,
   selectedCandy: null,
   selectedCandyIndex: null,
   randomCandies: [],
@@ -25,11 +26,18 @@ const game = {
   },
 
   setCardMoves: (card, candy, index) => {
-    card.addEventListener("touchstart", (e) => {
-      e.preventDefault()
-      game.dragStart(candy, index);
+    card.addEventListener("touchstart", () => (game.scrolling = false), {
+      passive: true,
+    });
+    card.addEventListener("touchstart", (e) => game.dragStart(candy, index), {
+      passive: true,
     });
     card.addEventListener("touchend", (e) => game.touchEnd(e));
+  },
+  // web mobile moves
+  touchStart: (e) => {
+    window.addEventListener("scroll", game.preventScroll);
+    scrolling = false;
   },
 
   touchMove: (e) => {
@@ -41,13 +49,6 @@ const game = {
     const rect = game.board.getBoundingClientRect();
     const offsetX = touchX - rect.left;
     const offsetY = touchY - rect.top;
-
-    console.log(offsetX);
-    console.log(offsetY);
-
-    // Faça o que for necessário com as coordenadas do toque (por exemplo, atualizar a posição do elemento do jogo)
-    // Por exemplo:
-    // game.moveElement(offsetX, offsetY);
   },
 
   touchEnd: (e) => {
@@ -85,8 +86,10 @@ const game = {
     }
 
     // Limpa as variáveis
+    scrolling = true;
     game.selectedcandy = null;
     game.selectedcandyIndex = null;
+    window.removeEventListener("scroll", game.preventScroll);
   },
 
   findIndexByCoordinates: (offsetX, offsetY) => {
@@ -99,6 +102,11 @@ const game = {
 
     // Retorna o índice da peça do jogo
     return index;
+  },
+
+  preventScroll: (e) => {
+    e.preventDefault();
+    window.scrollTo(0, 0);
   },
 
   getrandomCandies: () => {
@@ -137,7 +145,7 @@ const game = {
   },
 
   startGame: () => {
-    console.log("Game started");
+    // console.log("Game started");
     game.gameStarted = true;
     window.setInterval(() => {
       game.crushCandies();
