@@ -4,7 +4,7 @@ const game = {
   board: document.querySelector(".game__board"),
   candies: ["Blue", "Green", "Orange", "Purple", "Red", "Yellow"],
   width: 8,
-  scrolling: true,
+
   selectedCandy: null,
   selectedCandyIndex: null,
   randomCandies: [],
@@ -26,18 +26,17 @@ const game = {
   },
 
   setCardMoves: (card, candy, index) => {
-    card.addEventListener("touchstart", () => (game.scrolling = false), {
-      passive: true,
+    card.addEventListener("touchstart", () => console.log(), {
+      passive: false,
     });
     card.addEventListener("touchstart", (e) => game.dragStart(candy, index), {
-      passive: true,
+      passive: false,
     });
     card.addEventListener("touchend", (e) => game.touchEnd(e));
   },
   // web mobile moves
   touchStart: (e) => {
     window.addEventListener("scroll", game.preventScroll);
-    scrolling = false;
   },
 
   touchMove: (e) => {
@@ -86,7 +85,6 @@ const game = {
     }
 
     // Limpa as variáveis
-    scrolling = true;
     game.selectedcandy = null;
     game.selectedcandyIndex = null;
     window.removeEventListener("scroll", game.preventScroll);
@@ -139,6 +137,13 @@ const game = {
 
   startButtonClickHandler: () => {
     if (!game.gameStarted) {
+      game.board.addEventListener(
+        "touchmove",
+        (e) => {
+          e.preventDefault();
+        },
+        { passive: false }
+      );
       game.startGame();
     }
     game.startButton.disabled = true;
