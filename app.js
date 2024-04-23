@@ -4,7 +4,6 @@ const game = {
   board: document.querySelector(".game__board"),
   candies: ["Blue", "Green", "Orange", "Purple", "Red", "Yellow"],
   width: 8,
-  isDragging: false,
   selectedCandy: null,
   selectedCandyIndex: null,
   randomCandies: [],
@@ -42,20 +41,12 @@ const game = {
   // web mobile moves
   touchStart: (e, candy, index) => {
     e.preventDefault();
-    isDragging = true;
     game.selectedCandyIndex = index;
     game.selectedCandy = candy;
   },
 
   touchMove: (e, card) => {
     e.preventDefault();
-    if (isDragging) {
-      const touch = e.touches[0];
-      const offsetX = touch.clientX - card.getBoundingClientRect().left;
-      const offsetY = touch.clientY - card.getBoundingClientRect().top;
-
-      card.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-    }
   },
 
   touchEnd: (e, card) => {
@@ -75,8 +66,6 @@ const game = {
     const index = row * game.width + column;
 
     game.dragDrop(index);
-    isDragging = false;
-    card.style.transform = "";
   },
 
   findIndexByCoordinates: (offsetX, offsetY) => {
