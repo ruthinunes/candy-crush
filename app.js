@@ -4,7 +4,7 @@ const game = {
   board: document.querySelector(".game__board"),
   candies: ["Blue", "Green", "Orange", "Purple", "Red", "Yellow"],
   width: 8,
-
+  isDragging: false,
   selectedCandy: null,
   selectedCandyIndex: null,
   randomCandies: [],
@@ -26,19 +26,39 @@ const game = {
   },
 
   setCardMoves: (card, candy, index) => {
-    card.addEventListener("touchstart", () => game.touchStart(candy, index), {
+    card.addEventListener(
+      "touchstart",
+      (e) => game.touchStart(e, candy, index),
+      {
+        passive: false,
+      }
+    );
+    card.addEventListener("touchmove", (e) => game.touchMove(e, card), {
       passive: false,
     });
-    card.addEventListener("touchend", (e) => game.touchEnd(e, candy, index));
+    card.addEventListener("touchend", (e) => game.touchEnd(e, card, index));
   },
 
   // web mobile moves
-  touchStart: (candy, index) => {
+  touchStart: (e, candy, index) => {
+    e.preventDefault();
+    isDragging = true;
     game.selectedCandyIndex = index;
     game.selectedCandy = candy;
   },
 
-  touchEnd: (e) => {
+  touchMove: (e, card) => {
+    e.preventDefault();
+    if (isDragging) {
+      const touch = e.touches[0];
+      const offsetX = touch.clientX - card.getBoundingClientRect().left;
+      const offsetY = touch.clientY - card.getBoundingClientRect().top;
+
+      card.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    }
+  },
+
+  touchEnd: (e, card) => {
     const touchX = e.changedTouches[0].clientX;
     const touchY = e.changedTouches[0].clientY;
 
@@ -55,6 +75,8 @@ const game = {
     const index = row * game.width + column;
 
     game.dragDrop(index);
+    isDragging = false;
+    card.style.transform = "";
   },
 
   findIndexByCoordinates: (offsetX, offsetY) => {
